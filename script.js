@@ -1,280 +1,213 @@
-let bazaPrivychek = [];
+let habitsData = [];
 
-const spisokElement = document.getElementById('spisok-privychek');
-const oknoFormy = document.getElementById('okno-formy');
-const formaPrivychki = document.getElementById('forma-privychki');
-const zagolovokOkna = document.getElementById('zagolovok-okna');
+const habitsList = document.getElementById('habits-list');
+const modal = document.getElementById('modal');
+const habitForm = document.getElementById('habit-form');
+const modalTitle = document.getElementById('modal-title');
+const habitTemplate = document.getElementById('habit-template');
 
-const poleId = document.getElementById('id-privychki');
-const poleNazvanie = document.getElementById('nazvanie');
-const poleCvet = document.getElementById('cvet');
-const poleCel = document.getElementById('cel');
+const habitIdInput = document.getElementById('habit-id');
+const habitNameInput = document.getElementById('habit-name');
+const habitColorInput = document.getElementById('habit-color');
+const habitTargetInput = document.getElementById('habit-target');
 
-const knopkaDobavit = document.getElementById('knopka-dobavit');
-const knopkaOtmеna = document.getElementById('knopka-otmena');
+const addBtn = document.getElementById('add-btn');
+const cancelBtn = document.getElementById('cancel-btn');
 
-function poluchitSegodnya() {
-    const segodnya = new Date();
-    return segodnya.toISOString().split('T')[0];
+function getToday() {
+    return new Date().toISOString().split('T')[0];
 }
 
-function zagruzitDannye() {
-    const dannye = localStorage.getItem('treker_privychek');
-    if (dannye) {
-        try {
-            bazaPrivychek = JSON.parse(dannye);
-        } catch (e) {
-            bazaPrivychek = [];
-        }
+function loadData() {
+    const data = localStorage.getItem('habit_tracker_data');
+    if (data) {
+        try { habitsData = JSON.parse(data); } catch (e) { habitsData = []; }
     }
 }
 
-function sohranitDannye() {
-    localStorage.setItem('treker_privychek', JSON.stringify(bazaPrivychek));
+function saveData() {
+    localStorage.setItem('habit_tracker_data', JSON.stringify(habitsData));
 }
 
-function poschitatSeriyu(privychka) {
-    let seriya = 0;
-    let tekushchayaData = new Date();
-
+function calculateStreak(habit) {
+    let streak = 0;
+    let d = new Date();
     while (true) {
-        const dataStr = tekushchayaData.toISOString().split('T')[0];
-        const vypolneno = privychka.otmetki[dataStr] || 0;
-
-        if (vypolneno >= privychka.cel) {
-            seriya++;
-            tekushchayaData.setDate(tekushchayaData.getDate() - 1);
-        } else {
-            break;
-        }
+        if ((habit.records[d.toISOString().split('T')[0]] || 0) >= habit.target) {
+            streak++;
+            d.setDate(d.getDate() - 1);
+        } else break;
     }
-    return seriya;
+    return streak;
 }
 
-function poschitatProcentZaNedelyu(privychka) {
-    let vypolnennyhDney = 0;
-    const segodnya = new Date();
-
+function calculateWeeklyPercent(habit) {
+    let count = 0;
+    const today = new Date();
     for (let i = 0; i < 7; i++) {
-        const data = new Date(segodnya);
-        data.setDate(data.getDate() - i);
-        const dataStr = data.toISOString().split('T')[0];
-
-        const vypolneno = privychka.otmetki[dataStr] || 0;
-        if (vypolneno >= privychka.cel) {
-            vypolnennyhDney++;
-        }
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        if ((habit.records[d.toISOString().split('T')[0]] || 0) >= habit.target) count++;
     }
-    return Math.round((vypolnennyhDney / 7) * 100);
+    return Math.round((count / 7) * 100);
 }
 
-function proveritZapushchennost(privychka) {
-    const segodnya = new Date();
-
+function checkIfNeglected(habit) {
+    const today = new Date();
     for (let i = 1; i <= 3; i++) {
-        const data = new Date(segodnya);
-        data.setDate(data.getDate() - i);
-        const dataStr = data.toISOString().split('T')[0];
-
-        const vypolneno = privychka.otmetki[dataStr] || 0;
-        if (vypolneno < privychka.cel) {
-        } else {
-            return false;
-        }
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        if ((habit.records[d.toISOString().split('T')[0]] || 0) >= habit.target) return false;
     }
     return true;
 }
 
-function otrisovatVse() {
-    spisokElement.innerHTML = '';
-    const segodnyaStr = poluchitSegodnya();
-
-    if (bazaPrivychek.length === 0) {
-        spisokElement.innerHTML = '<div class="pustoy-spisok">Привычек пока нет. Нажмите «Добавить привычку».</div>';
+function renderAll() {
+    habitsList.innerHTML = '';
+    
+    if (habitsData.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'empty-list';
+        empty.textContent = 'Привычек пока нет. Нажмите «Добавить привычку».';
+        habitsList.appendChild(empty);
         return;
     }
 
-    bazaPrivychek.forEach(privychka => {
-        const vypolnenoSegodnya = privychka.otmetki[segodnyaStr] || 0;
-        const procent = Math.min(100, Math.round((vypolnenoSegodnya / privychka.cel) * 100));
-        const seriya = poschitatSeriyu(privychka);
-        const procentNedelya = poschitatProcentZaNedelyu(privychka);
-        const zapushchena = proveritZapushchennost(privychka);
+    const todayStr = getToday();
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-        const kartochka = document.createElement('div');
-        kartochka.className = 'kartochka-privychki';
-        kartochka.style.borderLeftColor = privychka.cvet;
+    habitsData.forEach(habit => {
+        const clone = habitTemplate.content.cloneNode(true);
+        const card = clone.querySelector('.habit-card');
+        
+        card.style.borderLeftColor = habit.color;
+        clone.querySelector('.habit-name-text').textContent = habit.name;
+        
+        if (checkIfNeglected(habit)) {
+            clone.querySelector('.badge-warning').classList.remove('hidden');
+        }
 
-        const metka = zapushchena ? '<span class="metka-zapushchena">Запущена</span>' : '';
-        const kalendarHtml = sozdatKalendar(privychka);
+        const doneToday = habit.records[todayStr] || 0;
+        const percent = Math.min(100, Math.round((doneToday / habit.target) * 100));
+        
+        const progressBar = clone.querySelector('.progress-bar');
+        progressBar.style.width = percent + '%';
+        progressBar.style.backgroundColor = habit.color;
+        progressBar.textContent = percent + '%';
 
-        kartochka.innerHTML = `
-            <div class="levaya-chast">
-                <div class="shapka-kartochki">
-                    <div class="nazvanie-privychki">
-                        ${privychka.nazvanie} ${metka}
-                    </div>
-                </div>
+        clone.querySelector('.counter-text').textContent = `${doneToday} / ${habit.target}`;
+        
+        const streak = calculateStreak(habit);
+        const weeklyPercent = calculateWeeklyPercent(habit);
+        clone.querySelector('.streak-text').textContent = `Серия: ${streak} дн. подряд`;
+        clone.querySelector('.weekly-text').textContent = `За последнюю неделю: ${weeklyPercent}% (${Math.round(weeklyPercent * 7 / 100)} из 7 дней)`;
 
-                <div class="konteyner-progressa">
-                    <div class="polosa-progressa" style="width: ${procent}%; background-color: ${privychka.cvet};">
-                        ${procent}%
-                    </div>
-                </div>
+        const calendarDiv = clone.querySelector('.calendar');
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const isDone = (habit.records[dateStr] || 0) >= habit.target;
+            
+            const dayElement = document.createElement('div');
+            dayElement.className = 'calendar-day';
+            dayElement.textContent = day;
+            if (isDone) {
+                dayElement.style.backgroundColor = habit.color;
+                dayElement.style.color = 'white';
+            }
+            calendarDiv.appendChild(dayElement);
+        }
 
-                <div class="upravlenie-privychkoy">
-                    <button class="knopka-plyus" data-id="${privychka.id}">+1</button>
-                    <span>${vypolnenoSegodnya} / ${privychka.cel}</span>
-                    <button class="knopka-sbrosa" data-id="${privychka.id}">Сбросить сегодня</button>
-                </div>
+        clone.querySelector('.plus-btn').addEventListener('click', () => addCompletion(habit.id));
+        clone.querySelector('.btn-reset').addEventListener('click', () => resetToday(habit.id));
+        clone.querySelector('.btn-edit').addEventListener('click', () => openEditModal(habit.id));
+        clone.querySelector('.btn-delete').addEventListener('click', () => deleteHabit(habit.id));
 
-                <div class="statistika-privychki">
-                    Серия: ${seriya} дн. подряд<br>
-                    За последнюю неделю: ${procentNedelya}% (${Math.round(procentNedelya * 7 / 100)} из 7 полных дней)
-                </div>
-            </div>
-
-            <div class="pravaya-chast">
-                <div class="statistika-privychki">Календарь на текущий месяц:</div>
-                <div class="kalendar">
-                    ${kalendarHtml}
-                </div>
-                <div style="margin-top: 10px; text-align: right;">
-                    <button class="knopka-redaktirovat" data-id="${privychka.id}">Редактировать</button>
-                    <button class="knopka-udaleniya" data-id="${privychka.id}">Удалить</button>
-                </div>
-            </div>
-        `;
-
-        spisokElement.appendChild(kartochka);
-    });
-
-    document.querySelectorAll('.knopka-plyus').forEach(btn => {
-        btn.addEventListener('click', () => dobavitVypolnenie(btn.dataset.id));
-    });
-    document.querySelectorAll('.knopka-sbrosa').forEach(btn => {
-        btn.addEventListener('click', () => sbrositSegodnya(btn.dataset.id));
-    });
-    document.querySelectorAll('.knopka-redaktirovat').forEach(btn => {
-        btn.addEventListener('click', () => otkrytRedaktor(btn.dataset.id));
-    });
-    document.querySelectorAll('.knopka-udaleniya').forEach(btn => {
-        btn.addEventListener('click', () => udalitPrivychku(btn.dataset.id));
+        habitsList.appendChild(clone);
     });
 }
 
-function sozdatKalendar(privychka) {
-    const segodnya = new Date();
-    const god = segodnya.getFullYear();
-    const mesyac = segodnya.getMonth();
-    const dneyVMesyace = new Date(god, mesyac + 1, 0).getDate();
-
-    let html = '';
-    for (let den = 1; den <= dneyVMesyace; den++) {
-        const dataStr = `${god}-${String(mesyac + 1).padStart(2, '0')}-${String(den).padStart(2, '0')}`;
-        const vypolneno = privychka.otmetki[dataStr] || 0;
-        const estVypolnenie = vypolneno >= privychka.cel;
-
-        const stil = estVypolnenie
-            ? `style="background-color: ${privychka.cvet}; color: white;"`
-            : '';
-
-        html += `<div class="den-kalendarya ${estVypolnenie ? 'vypolneno' : ''}" ${stil}>${den}</div>`;
-    }
-    return html;
+function addCompletion(id) {
+    const habit = habitsData.find(h => h.id === id);
+    if (!habit) return;
+    const todayStr = getToday();
+    let current = habit.records[todayStr] || 0;
+    if (current < habit.target) {
+        habit.records[todayStr] = current + 1;
+        saveData();
+        renderAll();
+    } else alert('Цель на сегодня уже достигнута!');
 }
 
-function dobavitVypolnenie(id) {
-    const privychka = bazaPrivychek.find(p => p.id === id);
-    if (!privychka) return;
-
-    const segodnyaStr = poluchitSegodnya();
-    let tekushchee = privychka.otmetki[segodnyaStr] || 0;
-
-    if (tekushchee < privychka.cel) {
-        privychka.otmetki[segodnyaStr] = tekushchee + 1;
-        sohranitDannye();
-        otrisovatVse();
-    } else {
-        alert('Цель на сегодня уже достигнута!');
+function resetToday(id) {
+    const habit = habitsData.find(h => h.id === id);
+    if (!habit) return;
+    const todayStr = getToday();
+    if (habit.records[todayStr]) {
+        habit.records[todayStr] = 0;
+        saveData();
+        renderAll();
     }
 }
 
-function sbrositSegodnya(id) {
-    const privychka = bazaPrivychek.find(p => p.id === id);
-    if (!privychka) return;
-
-    const segodnyaStr = poluchitSegodnya();
-    if (privychka.otmetki[segodnyaStr]) {
-        privychka.otmetki[segodnyaStr] = 0;
-        sohranitDannye();
-        otrisovatVse();
-    }
-}
-
-function udalitPrivychku(id) {
+function deleteHabit(id) {
     if (confirm('Вы уверены, что хотите удалить эту привычку?')) {
-        bazaPrivychek = bazaPrivychek.filter(p => p.id !== id);
-        sohranitDannye();
-        otrisovatVse();
+        habitsData = habitsData.filter(h => h.id !== id);
+        saveData();
+        renderAll();
     }
 }
 
-function otkrytFormu() {
-    poleId.value = '';
-    poleNazvanie.value = '';
-    poleCvet.value = '#4CAF50';
-    poleCel.value = '';
-    zagolovokOkna.textContent = 'Добавить привычку';
-    oknoFormy.classList.remove('skryto');
+function openAddModal() {
+    habitIdInput.value = '';
+    habitNameInput.value = '';
+    habitColorInput.value = '#4CAF50';
+    habitTargetInput.value = '';
+    modalTitle.textContent = 'Добавить привычку';
+    modal.classList.remove('hidden');
 }
 
-function otkrytRedaktor(id) {
-    const privychka = bazaPrivychek.find(p => p.id === id);
-    poleId.value = privychka.id;
-    poleNazvanie.value = privychka.nazvanie;
-    poleCvet.value = privychka.cvet;
-    poleCel.value = privychka.cel;
-    zagolovokOkna.textContent = 'Редактировать привычку';
-    oknoFormy.classList.remove('skryto');
+function openEditModal(id) {
+    const habit = habitsData.find(h => h.id === id);
+    habitIdInput.value = habit.id;
+    habitNameInput.value = habit.name;
+    habitColorInput.value = habit.color;
+    habitTargetInput.value = habit.target;
+    modalTitle.textContent = 'Редактировать привычку';
+    modal.classList.remove('hidden');
 }
 
-function zakrytFormu() {
-    oknoFormy.classList.add('skryto');
+function closeModal() {
+    modal.classList.add('hidden');
 }
 
-knopkaDobavit.addEventListener('click', otkrytFormu);
-knopkaOtmеna.addEventListener('click', zakrytFormu);
+addBtn.addEventListener('click', openAddModal);
+cancelBtn.addEventListener('click', closeModal);
 
-formaPrivychki.addEventListener('submit', (e) => {
+habitForm.addEventListener('submit', (e) => {
     e.preventDefault();
+    const id = habitIdInput.value || Date.now().toString();
+    const name = habitNameInput.value.trim();
+    const color = habitColorInput.value;
+    const target = parseInt(habitTargetInput.value);
     
-    const id = poleId.value || Date.now().toString();
-    const nazvanie = poleNazvanie.value.trim();
-    const cvet = poleCvet.value;
-    const cel = parseInt(poleCel.value);
-    
-    if (!nazvanie || !cel || cel < 1) return;
+    if (!name || !target || target < 1) return;
 
-    if (poleId.value) {
-        const privychka = bazaPrivychek.find(p => p.id === poleId.value);
-        privychka.nazvanie = nazvanie;
-        privychka.cvet = cvet;
-        privychka.cel = cel;
+    if (habitIdInput.value) {
+        const habit = habitsData.find(h => h.id === habitIdInput.value);
+        habit.name = name;
+        habit.color = color;
+        habit.target = target;
     } else {
-        bazaPrivychek.push({
-            id: id,
-            nazvanie: nazvanie,
-            cvet: cvet,
-            cel: cel,
-            otmetki: {}
-        });
+        habitsData.push({ id: id, name: name, color: color, target: target, records: {} });
     }
     
-    sohranitDannye();
-    zakrytFormu();
-    otrisovatVse();
+    saveData();
+    closeModal();
+    renderAll();
 });
 
-zagruzitDannye();
-otrisovatVse();
+loadData();
+renderAll();
