@@ -7,46 +7,72 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="glavnyy-konteyner">
-        <header class="shapka">
+    <div class="container">
+        <header class="header">
             <h1>Трекер привычек</h1>
-            <button id="knopka-dobavit" class="knopka-glavnaya">Добавить привычку</button>
+            <button id="add-btn" class="btn-primary">Добавить привычку</button>
         </header>
-
-        <main id="spisok-privychek" class="spisok-privychek">
-            <!-- Карточки привычек будут здесь -->
-        </main>
+        <main id="habits-list" class="habits-list"></main>
     </div>
 
-    <!-- Окно формы -->
-    <div id="okno-formy" class="okno-formy skryto">
-        <div class="soderzhimoe-okna">
-            <h2 id="zagolovok-okna">Добавить привычку</h2>
-            <form id="forma-privychki">
-                <input type="hidden" id="id-privychki">
-
-                <div class="gruppa-poley">
-                    <label for="nazvanie">Название:</label>
-                    <input type="text" id="nazvanie" required maxlength="40" placeholder="Например: Пить воду">
+    <div id="modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 id="modal-title">Добавить привычку</h2>
+            <form id="habit-form">
+                <input type="hidden" id="habit-id">
+                <div class="form-group">
+                    <label for="habit-name">Название:</label>
+                    <input type="text" id="habit-name" required maxlength="40" placeholder="Например: Пить воду">
                 </div>
-
-                <div class="gruppa-poley">
-                    <label for="cvet">Цвет:</label>
-                    <input type="color" id="cvet" value="#4CAF50" required>
+                <div class="form-group">
+                    <label for="habit-color">Цвет:</label>
+                    <input type="color" id="habit-color" value="#3fd2525" required>
                 </div>
-
-                <div class="gruppa-poley">
-                    <label for="cel">Цель в день:</label>
-                    <input type="number" id="cel" min="1" max="1000" required placeholder="Например: 8">
+                <div class="form-group">
+                    <label for="habit-target">Цель в день:</label>
+                    <input type="number" id="habit-target" min="1" max="1000" required placeholder="Например: 8">
                 </div>
-
-                <div class="deystviya-okna">
-                    <button type="button" id="knopka-otmena" class="knopka-vtorostepennaya">Отмена</button>
-                    <button type="submit" class="knopka-glavnaya">Сохранить</button>
+                <div class="modal-actions">
+                    <button type="button" id="cancel-btn" class="btn-secondary">Отмена</button>
+                    <button type="submit" class="btn-primary">Сохранить</button>
                 </div>
             </form>
         </div>
     </div>
+
+    <!-- ШАБЛОН КАРТОЧКИ -->
+    <template id="habit-template">
+        <div class="habit-card">
+            <div>
+                <div class="card-header">
+                    <div class="habit-title">
+                        <span class="habit-name-text"></span>
+                        <span class="badge-warning hidden">Запущена</span>
+                    </div>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar"></div>
+                </div>
+                <div class="controls">
+                    <button class="plus-btn">+1</button>
+                    <span class="counter-text"></span>
+                    <button class="btn-reset">Сбросить сегодня</button>
+                </div>
+                <div class="stats-info">
+                    <span class="streak-text"></span><br>
+                    <span class="weekly-text"></span>
+                </div>
+            </div>
+            <div>
+                <div class="stats-info">Календарь на текущий месяц:</div>
+                <div class="calendar"></div>
+                <div class="card-actions">
+                    <button class="btn-warning btn-edit">Редактировать</button>
+                    <button class="btn-danger btn-delete">Удалить</button>
+                </div>
+            </div>
+        </div>
+    </template>
 
     <script src="script.js"></script>
 </body>
