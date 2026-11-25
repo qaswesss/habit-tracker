@@ -21,7 +21,6 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-    flex-wrap: wrap;
     gap: 10px;
 }
 
@@ -31,11 +30,6 @@ button {
     border: none;
     border-radius: 6px;
     font-size: 14px;
-    transition: opacity 0.2s;
-}
-
-button:hover {
-    opacity: 0.85;
 }
 
 .btn-primary {
@@ -79,26 +73,16 @@ button:hover {
     background: #ffffff;
     border-radius: 10px;
     padding: 15px 20px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.07);
     border-left: 6px solid #2196F3;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 800px) {
     .habit-card {
         grid-template-columns: 1fr;
     }
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 10px;
-    flex-wrap: wrap;
-    gap: 5px;
 }
 
 .habit-title {
@@ -114,7 +98,6 @@ button:hover {
     font-size: 15px;
     font-weight: bold;
     margin-left: 8px;
-    display: inline-block;
 }
 
 .progress-container {
@@ -122,7 +105,6 @@ button:hover {
     border-radius: 10px;
     height: 22px;
     margin: 10px 0;
-    position: relative;
     overflow: hidden;
 }
 
@@ -213,8 +195,7 @@ button:hover {
 }
 
 .form-group input[type="text"],
-.form-group input[type="number"]
-{
+.form-group input[type="number"] {
     padding: 8px;
     border: 1px solid #cccccc;
     border-radius: 4px;
@@ -224,7 +205,6 @@ button:hover {
 .form-group input[type="color"] {
     height: 42px;
     border: none;
-    cursor: pointer;
     background: none;
 }
 
@@ -248,5 +228,4 @@ button:hover {
 
 .card-actions {
     margin-top: 10px;
-    text-align: right;
 }
