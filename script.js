@@ -163,7 +163,7 @@ function deleteHabit(id) {
 function openAddModal() {
     habitIdInput.value = '';
     habitNameInput.value = '';
-    habitColorInput.value = '#4CAF50';
+    habitColorInput.value = '#904caf';
     habitTargetInput.value = '';
     modalTitle.textContent = 'Добавить привычку';
     modal.classList.remove('hidden');
