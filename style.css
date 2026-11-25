@@ -1,11 +1,10 @@
 :root {
-    --fon-stranicy: #f4f7f6;
-    --fon-kartochki: #ffffff;
-    --cvet-teksta: #333333;
-    --cvet-ramki: #e0e0e0;
-    --osnovnoy-cvet: #2196F3;
-    --krasnyy-cvet: #f44336;
-    --seryy-cvet: #9e9e9e;
+    --bg-color: #f4f7f6;
+    --card-bg: #ffffff;
+    --text-color: #333333;
+    --primary-color: #2196F3;
+    --danger-color: #f44336;
+    --gray-color: #9e9e9e;
 }
 
 * {
@@ -16,17 +15,17 @@
 }
 
 body {
-    background-color: var(--fon-stranicy);
-    color: var(--cvet-teksta);
+    background-color: var(--bg-color);
+    color: var(--text-color);
     padding: 20px;
 }
 
-.glavnyy-konteyner {
+.container {
     max-width: 950px;
     margin: 0 auto;
 }
 
-.shapka {
+.header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -46,34 +45,34 @@ button {
 
 button:hover { opacity: 0.85; }
 
-.knopka-glavnaya { background-color: var(--osnovnoy-cvet); color: white; }
-.knopka-vtorostepennaya { background-color: var(--seryy-cvet); color: white; }
-.knopka-udaleniya { background-color: var(--krasnyy-cvet); color: white; padding: 5px 10px; font-size: 12px; }
-.knopka-redaktirovat { background-color: #ff9800; color: white; padding: 5px 10px; font-size: 12px; }
-.knopka-sbrosa { background-color: #607d8b; color: white; padding: 5px 10px; font-size: 12px; }
+.btn-primary { background-color: var(--primary-color); color: white; }
+.btn-secondary { background-color: var(--gray-color); color: white; }
+.btn-danger { background-color: var(--danger-color); color: white; padding: 5px 10px; font-size: 12px; }
+.btn-warning { background-color: #ff9800; color: white; padding: 5px 10px; font-size: 12px; }
+.btn-reset { background-color: #607d8b; color: white; padding: 5px 10px; font-size: 12px; }
 
-.spisok-privychek {
+.habits-list {
     display: flex;
     flex-direction: column;
     gap: 15px;
 }
 
-.kartochka-privychki {
-    background: var(--fon-kartochki);
+.habit-card {
+    background: var(--card-bg);
     border-radius: 10px;
     padding: 15px 20px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.07);
-    border-left: 6px solid var(--osnovnoy-cvet);
+    border-left: 6px solid var(--primary-color);
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
 }
 
 @media (max-width: 768px) {
-    .kartochka-privychki { grid-template-columns: 1fr; }
+    .habit-card { grid-template-columns: 1fr; }
 }
 
-.shapka-kartochki {
+.card-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -82,12 +81,12 @@ button:hover { opacity: 0.85; }
     gap: 5px;
 }
 
-.nazvanie-privychki {
+.habit-title {
     font-size: 18px;
     font-weight: bold;
 }
 
-.metka-zapushchena {
+.badge-warning {
     background: #ffeb3b;
     color: #333;
     padding: 2px 6px;
@@ -98,7 +97,7 @@ button:hover { opacity: 0.85; }
     display: inline-block;
 }
 
-.konteyner-progressa {
+.progress-container {
     background: #eeeeee;
     border-radius: 10px;
     height: 22px;
@@ -107,7 +106,7 @@ button:hover { opacity: 0.85; }
     overflow: hidden;
 }
 
-.polosa-progressa {
+.progress-bar {
     height: 100%;
     transition: width 0.3s;
     display: flex;
@@ -118,7 +117,7 @@ button:hover { opacity: 0.85; }
     font-weight: bold;
 }
 
-.upravlenie-privychkoy {
+.controls {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -126,8 +125,8 @@ button:hover { opacity: 0.85; }
     flex-wrap: wrap;
 }
 
-.knopka-plyus {
-    background: var(--osnovnoy-cvet);
+.plus-btn {
+    background: var(--primary-color);
     color: white;
     font-size: 20px;
     font-weight: bold;
@@ -140,21 +139,21 @@ button:hover { opacity: 0.85; }
     padding: 0;
 }
 
-.statistika-privychki {
+.stats-info {
     font-size: 12px;
     color: #555;
     margin-bottom: 6px;
     line-height: 1.4;
 }
 
-.kalendar {
+.calendar {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 2px;
     margin-top: 5px;
 }
 
-.den-kalendarya {
+.calendar-day {
     aspect-ratio: 1;
     display: flex;
     justify-content: center;
@@ -165,7 +164,7 @@ button:hover { opacity: 0.85; }
     color: #aaa;
 }
 
-.okno-formy {
+.modal {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0,0,0,0.5);
@@ -175,9 +174,9 @@ button:hover { opacity: 0.85; }
     z-index: 100;
 }
 
-.okno-formy.skryto { display: none; }
+.modal.hidden { display: none; }
 
-.soderzhimoe-okna {
+.modal-content {
     background: white;
     padding: 20px;
     border-radius: 10px;
@@ -185,38 +184,47 @@ button:hover { opacity: 0.85; }
     max-width: 420px;
 }
 
-.gruppa-poley {
+.form-group {
     margin-bottom: 15px;
     display: flex;
     flex-direction: column;
     gap: 4px;
 }
 
-.gruppa-poley input[type="text"],
-.gruppa-poley input[type="number"] {
+.form-group input[type="text"],
+.form-group input[type="number"] {
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 14px;
 }
 
-.gruppa-poley input[type="color"] {
+.form-group input[type="color"] {
     height: 42px;
     border: none;
     cursor: pointer;
     background: none;
 }
 
-.deystviya-okna {
+.modal-actions {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
     margin-top: 20px;
 }
 
-.pustoy-spisok {
+.empty-list {
     text-align: center;
     color: #888;
     padding: 40px 0;
     font-size: 16px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.card-actions {
+    margin-top: 10px;
+    text-align: right;
 }
