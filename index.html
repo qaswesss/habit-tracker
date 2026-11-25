@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Трекер привычек</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="glavnyy-konteyner">
+        <header class="shapka">
+            <h1>Трекер привычек</h1>
+            <button id="knopka-dobavit" class="knopka-glavnaya">Добавить привычку</button>
+        </header>
+
+        <main id="spisok-privychek" class="spisok-privychek">
+            <!-- Карточки привычек будут здесь -->
+        </main>
+    </div>
+
+    <!-- Окно формы -->
+    <div id="okno-formy" class="okno-formy skryto">
+        <div class="soderzhimoe-okna">
+            <h2 id="zagolovok-okna">Добавить привычку</h2>
+            <form id="forma-privychki">
+                <input type="hidden" id="id-privychki">
+
+                <div class="gruppa-poley">
+                    <label for="nazvanie">Название:</label>
+                    <input type="text" id="nazvanie" required maxlength="40" placeholder="Например: Пить воду">
+                </div>
+
+                <div class="gruppa-poley">
+                    <label for="cvet">Цвет:</label>
+                    <input type="color" id="cvet" value="#4CAF50" required>
+                </div>
+
+                <div class="gruppa-poley">
+                    <label for="cel">Цель в день:</label>
+                    <input type="number" id="cel" min="1" max="1000" required placeholder="Например: 8">
+                </div>
+
+                <div class="deystviya-okna">
+                    <button type="button" id="knopka-otmena" class="knopka-vtorostepennaya">Отмена</button>
+                    <button type="submit" class="knopka-glavnaya">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
